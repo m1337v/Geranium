@@ -22,8 +22,8 @@ jobs:
 
       - name: Run Build Script
         run: |
-          chmod +x ./build_ipa.sh
-          ./build_ipa.sh
+          chmod +x ./ipabuild.sh
+          ./ipabuild.sh
         env:
           APPLICATION_NAME: Geranium
           CONFIGURATION: Debug
