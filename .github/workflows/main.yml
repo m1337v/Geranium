@@ -1,0 +1,56 @@
+name: Build and Release IPA
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true  # Check out submodules if necessary
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install ldid
+
+      - name: Run Build Script
+        run: |
+          chmod +x ./build_ipa.sh
+          ./build_ipa.sh
+        env:
+          APPLICATION_NAME: Geranium
+          CONFIGURATION: Debug
+
+      - name: Rename IPA to Geranium.ipa
+        run: |
+          mv build/Geranium.tipa build/Geranium.ipa
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          release_name: Latest Build
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+          overwrite: true
+
+      - name: Upload IPA to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/Geranium.ipa
+          asset_name: Geranium.ipa
+          asset_content_type: application/zip
