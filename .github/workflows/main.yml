@@ -29,6 +29,7 @@ jobs:
           git submodule update --init --recursive --force
           # Set up environment variables
           export THEOS=~/theos
+          export THEOS_MAKE_PATH=~/theos/makefiles
           echo "export THEOS=~/theos" >> $GITHUB_ENV
           echo "export THEOS_MAKE_PATH=~/theos/makefiles" >> $GITHUB_ENV
 
@@ -39,8 +40,7 @@ jobs:
           git submodule foreach --recursive git reset --hard
           git submodule update --init --recursive
 
-      # Optional: Remove this step if makefiles are properly fetched by submodules
-      - name: Create Missing Makefiles
+      - name: Create Missing Makefiles (if needed)
         run: |
           mkdir -p ~/theos/makefiles
           echo -e "include \$(THEOS)/makefiles/common.mk\nCC = clang\nCFLAGS = -Wall" > ~/theos/makefiles/common.mk
