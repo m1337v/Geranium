@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          submodules: true  # Check out submodules if necessary
+          submodules: recursive  # Check out submodules if necessary
 
       - name: Install Homebrew dependencies
         run: |
