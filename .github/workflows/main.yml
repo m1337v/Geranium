@@ -40,13 +40,6 @@ jobs:
           rm $THEOS/sdks/iPhoneOS16.5.sdk.tar
           cd $BASEDIR
 
-      - name: Verify Theos Installation
-        run: |
-          echo "Checking Theos installation..."
-          ls -la $THEOS
-          ls -la $THEOS/makefiles
-          ls -la $THEOS_MAKE_PATH
-
       - name: Run Build Script
         run: |
           chmod +x ./ipabuild.sh
