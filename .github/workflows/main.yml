@@ -19,7 +19,7 @@ jobs:
       - name: Install Procursus
         uses: dhinakg/procursus-action@main
         with:
-          packages: ldid dpkg findutils sed coreutils make
+          packages: ldid findutils sed coreutils make  # Install necessary dependencies through Procursus
 
       - name: Install THEOS
         run: |
@@ -30,15 +30,16 @@ jobs:
           # Download and prepare the Theos installer script
           curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
           # Modify the installer script if needed
-          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
+          sed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
           # Run the modified installer
           bash install-theos.sh
           # Download and install the specific iOS SDK
-          curl -L https://github.com/theos/sdks/releases/latest/download/iPhoneOS16.5.sdk.tar.xz --output $THEOS/sdks/iPhoneOS16.5.sdk.tar.xz
-          gunzip $THEOS/sdks/iPhoneOS16.5.sdk.tar.xz
-          tar -xf $THEOS/sdks/iPhoneOS16.5.sdk.tar -C $THEOS/sdks
-          rm $THEOS/sdks/iPhoneOS16.5.sdk.tar
+          curl -L https://github.com/theos/sdks/releases/download/ios14.5/iPhoneOS14.5.sdk.tar.xz --output $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz
+          tar -xf $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz -C $THEOS/sdks
+          rm $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz
           cd $BASEDIR
+          echo "export THEOS=${THEOS}" >> $GITHUB_ENV
+          echo "export THEOS_MAKE_PATH=${THEOS}/makefiles" >> $GITHUB_ENV
 
       - name: Run Build Script
         run: |
