@@ -30,7 +30,7 @@ jobs:
           # Download and prepare the Theos installer script
           curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
           # Modify the installer script if needed
-          sed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
+          sed -E -i '' "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" install-theos.sh
           # Run the modified installer
           bash install-theos.sh
           # Download and install the specific iOS SDK
