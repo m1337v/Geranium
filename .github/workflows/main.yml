@@ -22,8 +22,11 @@ jobs:
 
       - name: Install Theos
         run: |
-          # Clone Theos and set up the environment
+          # Clone Theos with submodules
           git clone --recursive https://github.com/theos/theos.git ~/theos
+          cd ~/theos
+          git submodule update --init --recursive
+          export THEOS=~/theos
           echo "export THEOS=~/theos" >> $GITHUB_ENV
           echo "export THEOS_MAKE_PATH=~/theos/makefiles" >> $GITHUB_ENV
 
