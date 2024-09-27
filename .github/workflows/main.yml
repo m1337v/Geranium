@@ -16,9 +16,10 @@ jobs:
         with:
           submodules: recursive  # Ensure submodules are checked out recursively
 
-      - name: Install Homebrew dependencies
-        run: |
-          brew install ldid dpkg findutils sed coreutils make
+      - name: Install Procursus
+        uses: dhinakg/procursus-action@main
+        with:
+          packages: ldid dpkg findutils sed coreutils make
 
       - name: Install THEOS
         run: |
