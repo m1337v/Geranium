@@ -31,6 +31,8 @@ jobs:
         run: |
           echo "Checking Theos installation..."
           ls -la $THEOS
+          ls -la $THEOS/makefiles
+          ls -la $THEOS_MAKE_PATH
 
       - name: Run Build Script
         run: |
