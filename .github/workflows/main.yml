@@ -20,31 +20,24 @@ jobs:
         run: |
           brew install ldid dpkg
 
-      - name: Install Theos
+      - name: Install THEOS
         run: |
-          # Clone Theos and ensure all submodules are updated
-          git clone https://github.com/theos/theos.git ~/theos
-          cd ~/theos
-          # Force update of all submodules
-          git submodule update --init --recursive --force
-          # Set up environment variables
-          export THEOS=~/theos
-          export THEOS_MAKE_PATH=~/theos/makefiles
-          echo "export THEOS=~/theos" >> $GITHUB_ENV
-          echo "export THEOS_MAKE_PATH=~/theos/makefiles" >> $GITHUB_ENV
-
-      - name: Force Submodule Update for Theos Makefiles
-        run: |
-          cd ~/theos
-          git submodule foreach --recursive git fetch --all
-          git submodule foreach --recursive git reset --hard
-          git submodule update --init --recursive
-
-      - name: Create Missing Makefiles (if needed)
-        run: |
-          mkdir -p ~/theos/makefiles
-          echo -e "include \$(THEOS)/makefiles/common.mk\nCC = clang\nCFLAGS = -Wall" > ~/theos/makefiles/common.mk
-          echo -e "TOOL_NAME = GeraniumRootHelper\nTOOLS = some_tool" > ~/theos/makefiles/tool.mk
+          set -x
+          export BASEDIR="$(pwd)"
+          export THEOS="${BASEDIR}/theos"
+          mkdir -p $THEOS
+          # Download and prepare the Theos installer script
+          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
+          # Modify the installer script if needed
+          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
+          # Run the modified installer
+          bash install-theos.sh
+          # Download and install the specific iOS SDK
+          curl -L https://github.com/theos/sdks/releases/latest/download/iPhoneOS16.5.sdk.tar.xz --output $THEOS/sdks/iPhoneOS16.5.sdk.tar.xz
+          gunzip $THEOS/sdks/iPhoneOS16.5.sdk.tar.xz
+          tar -xf $THEOS/sdks/iPhoneOS16.5.sdk.tar -C $THEOS/sdks
+          rm $THEOS/sdks/iPhoneOS16.5.sdk.tar
+          cd $BASEDIR
 
       - name: Verify Theos Installation
         run: |
@@ -52,8 +45,6 @@ jobs:
           ls -la $THEOS
           ls -la $THEOS/makefiles
           ls -la $THEOS_MAKE_PATH
-          cd ~/theos
-          git submodule status
 
       - name: Run Build Script
         run: |
