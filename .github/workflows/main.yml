@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          submodules: recursive  # Check out submodules if necessary
+          submodules: recursive  # Ensure submodules are checked out recursively
 
       - name: Install Homebrew dependencies
         run: |
@@ -22,13 +22,29 @@ jobs:
 
       - name: Install Theos
         run: |
-          # Clone Theos with submodules
-          git clone --recursive https://github.com/theos/theos.git ~/theos
+          # Clone Theos and ensure all submodules are updated
+          git clone https://github.com/theos/theos.git ~/theos
           cd ~/theos
-          git submodule update --init --recursive
+          # Force update of all submodules
+          git submodule update --init --recursive --force
+          # Set up environment variables
           export THEOS=~/theos
           echo "export THEOS=~/theos" >> $GITHUB_ENV
           echo "export THEOS_MAKE_PATH=~/theos/makefiles" >> $GITHUB_ENV
+
+      - name: Force Submodule Update for Theos Makefiles
+        run: |
+          cd ~/theos
+          git submodule foreach --recursive git fetch --all
+          git submodule foreach --recursive git reset --hard
+          git submodule update --init --recursive
+
+      # Optional: Remove this step if makefiles are properly fetched by submodules
+      - name: Create Missing Makefiles
+        run: |
+          mkdir -p ~/theos/makefiles
+          echo -e "include \$(THEOS)/makefiles/common.mk\nCC = clang\nCFLAGS = -Wall" > ~/theos/makefiles/common.mk
+          echo -e "TOOL_NAME = GeraniumRootHelper\nTOOLS = some_tool" > ~/theos/makefiles/tool.mk
 
       - name: Verify Theos Installation
         run: |
@@ -36,6 +52,9 @@ jobs:
           ls -la $THEOS
           ls -la $THEOS/makefiles
           ls -la $THEOS_MAKE_PATH
+          cd ~/theos
+          git submodule status
+          ls -la ~/theos/makefiles
 
       - name: Run Build Script
         run: |
@@ -44,6 +63,8 @@ jobs:
         env:
           APPLICATION_NAME: Geranium
           CONFIGURATION: Debug
+          THEOS: ${{ env.THEOS }}
+          THEOS_MAKE_PATH: ${{ env.THEOS_MAKE_PATH }}
 
       - name: Rename IPA to Geranium.ipa
         run: |
