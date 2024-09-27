@@ -31,10 +31,10 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
           # Modify the installer script if needed
           sed -E -i '' "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" install-theos.sh
-          # Run the modified installer
+          # Run the modified installer (skip automatic SDK fetch)
           bash install-theos.sh
           # Download and install the specific iOS SDK
-          curl -L https://github.com/theos/sdks/releases/download/ios14.5/iPhoneOS14.5.sdk.tar.xz --output $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz
+          curl -L https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS14.5.sdk.tar.xz --output $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz
           tar -xf $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz -C $THEOS/sdks
           rm $THEOS/sdks/iPhoneOS14.5.sdk.tar.xz
           cd $BASEDIR
