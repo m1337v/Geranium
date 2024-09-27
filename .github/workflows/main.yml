@@ -54,7 +54,6 @@ jobs:
           ls -la $THEOS_MAKE_PATH
           cd ~/theos
           git submodule status
-          ls -la ~/theos/makefiles
 
       - name: Run Build Script
         run: |
